@@ -23,6 +23,7 @@
 import { execSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { spawnNpmSync } from "./npm-command.mjs";
 import { getPublicWorkspacePackages } from "./release-packages.mjs";
 import { hydrateModelCatalogBytes, updateModelCatalogPin } from "./update-model-catalog-pin.mjs";
 
@@ -59,7 +60,7 @@ function assertPackagesAreRegisteredWithNpm() {
 
 	console.log("Checking npm package registration...");
 	for (const packageName of packageNames) {
-		const result = spawnSync(process.platform === "win32" ? "npm.cmd" : "npm", ["view", packageName, "version", "--json"], {
+		const result = spawnNpmSync(["view", packageName, "version", "--json"], {
 			encoding: "utf8",
 			stdio: ["ignore", "pipe", "pipe"],
 		});
@@ -105,8 +106,7 @@ async function pinAndBuildWithNewestModelCatalog() {
 		console.log(`  Pinned model catalog ${revision}`);
 		hydrateModelCatalogBytes(root, pin.bytes);
 		console.log("$ npm run build:offline");
-		const npm = process.platform === "win32" ? "npm.cmd" : "npm";
-		result = spawnSync(npm, ["run", "build:offline"], { stdio: "inherit" });
+		result = spawnNpmSync(["run", "build:offline"], { stdio: "inherit" });
 	} finally {
 		if (result?.status !== 0) writeFileSync(MODEL_CATALOG_PIN, committedPin);
 	}
