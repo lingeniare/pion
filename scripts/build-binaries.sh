@@ -168,7 +168,15 @@ for platform in "${PLATFORMS[@]}"; do
     if [[ "$platform" == windows-* ]]; then
         # Windows (zip)
         echo "Creating pion-$platform.zip..."
-        (cd "$platform" && zip -r ../pion-$platform.zip .)
+        if command -v zip >/dev/null 2>&1; then
+            (cd "$platform" && zip -r ../pion-$platform.zip .)
+        elif [[ -x "$WINDIR/System32/tar.exe" ]]; then
+            # Git Bash has no zip; Windows' bundled bsdtar writes standard zips (PowerShell's Compress-Archive does not)
+            (cd "$platform" && "$WINDIR/System32/tar.exe" -a -c -f "../pion-$platform.zip" .)
+        else
+            echo "error: need zip or Windows' bundled tar.exe to create pion-$platform.zip" >&2
+            exit 1
+        fi
     else
         # Unix platforms (tar.gz) - use wrapper directory for mise compatibility
         echo "Creating pion-$platform.tar.gz..."

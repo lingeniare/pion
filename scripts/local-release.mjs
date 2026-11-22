@@ -34,6 +34,12 @@ function currentBinaryPlatform() {
 	throw new Error(`Unsupported binary platform: ${process.platform} ${process.arch}`);
 }
 
+/** Bash resolves relative paths against pwd; on Windows a `C:\...` --out must be passed in MSYS form (/c/...). */
+function toBashPath(path) {
+	if (process.platform !== "win32") return path;
+	return `/${path.replace(/\\/g, "/").replace(/^([A-Za-z]):/, (_, drive) => drive.toLowerCase())}`;
+}
+
 function buildBunBinaryRelease(targetDirectory, archiveDirectory) {
 	const platform = currentBinaryPlatform();
 	const binaryBuildDirectory = join(archiveDirectory, "binary-build");
@@ -43,7 +49,7 @@ function buildBunBinaryRelease(targetDirectory, archiveDirectory) {
 		"--platform",
 		platform,
 		"--out",
-		binaryBuildDirectory,
+		toBashPath(binaryBuildDirectory),
 	], { stdio: "inherit" });
 	rmSync(targetDirectory, { force: true, recursive: true });
 	cpSync(join(binaryBuildDirectory, platform), targetDirectory, { recursive: true });
