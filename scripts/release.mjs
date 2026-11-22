@@ -20,7 +20,7 @@
  * 10. Push main and the tag to trigger CI publication and verified pi.dev announcement
  */
 
-import { execSync, spawnSync } from "node:child_process";
+import { execFileSync, execSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { spawnNpmSync } from "./npm-command.mjs";
@@ -141,10 +141,6 @@ function compareVersions(a, b) {
 	return 0;
 }
 
-function shellQuote(value) {
-	return `'${value.replace(/'/g, `'\\''`)}'`;
-}
-
 function removeStaleWorkspaceLockEntries() {
 	const workspaceVersions = new Map(
 		getPublicWorkspacePackages().map((pkg) => [pkg.name, pkg.version]),
@@ -179,7 +175,8 @@ function stageChangedFiles() {
 		return;
 	}
 
-	run(`git add -- ${paths.map(shellQuote).join(" ")}`);
+	// execFileSync: no shell quoting; cmd.exe would keep single quotes literal
+	execFileSync("git", ["add", "--", ...paths], { stdio: "inherit" });
 }
 
 function bumpOrSetVersion(target) {
