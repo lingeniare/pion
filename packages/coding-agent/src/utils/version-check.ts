@@ -2,8 +2,7 @@ import { compare, valid } from "semver";
 import { fetchWithRetry } from "./management-http.ts";
 import { getPionUserAgent } from "./pion-user-agent.ts";
 
-const DEFAULT_LATEST_VERSION_URL =
-	"https://github.com/lingeniare/pi-vega/releases/latest/download/installer-release.json";
+const DEFAULT_LATEST_VERSION_URL = "https://github.com/lingeniare/pion/releases/latest/download/installer-release.json";
 const DEFAULT_VERSION_CHECK_TIMEOUT_MS = 10000;
 
 export interface LatestPiRelease {

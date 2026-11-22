@@ -5,6 +5,12 @@
 ### Added
 
 - Added `compat.supportsStrictMode` to the `google-generative-ai` and `google-vertex` APIs, so Gemini 3+ models served under IDs without the version can use strict tools (`VALIDATED` function calling); unset keeps the model ID detection ([#12321](https://github.com/earendil-works/pi/issues/12321))
+- The `vega` provider now routes `anthropic/*` model IDs through the Anthropic Messages API on the gateway, maps OpenRouter reasoning metadata to thinking levels, filters the catalog to tool-capable chat models, and lists the key's image and classifier models alongside chat models
+- OpenRouter-compatible requests now send `usage: {include: true}` so gateways return the upstream's native token accounting; after a stream the gateway's `GET /generation` record replaces the reported cost and records the serving provider and latency in the message's diagnostics
+
+### Changed
+
+- Client attribution (`PI_ATTRIBUTION`) now reports the app as `VEGA` (`HTTP-Referer: https://api.vega.chat`, `X-OpenRouter-Title: VEGA`, `X-OpenRouter-Categories: general-chat`) so OpenRouter rankings consolidate VEGA traffic under one entry
 
 ### Fixed
 
@@ -16,6 +22,7 @@
 - Fixed Amazon Bedrock requests hanging behind `HTTPS_PROXY` with AWS SSO profiles: SSO credential and token requests now go through the proxy like the Bedrock request ([#12353](https://github.com/earendil-works/pi/issues/12353))
 - Fixed OpenAI Decisions (`gpt-6-luna` classifier) usage dropping `cached_tokens` and `cache_write_tokens`: they are now reported as `cacheRead` and `cacheWrite` and no longer counted in `input`, and the catalog prices them at the input rate so the cost estimate is unchanged ([#12264](https://github.com/earendil-works/pi/issues/12264))
 - Fixed `createProvider` providers with `fetchModels` re-merging the whole model catalog on every `getModels()`/`getAllModels()` call, which made `getModel()` quadratic in catalog size and blocked the event loop for about a second with ~10k models. The merge now runs once per published refresh ([#12311](https://github.com/earendil-works/pi/issues/12311))
+- Fixed the `vega` provider not being recognized as OpenRouter-compatible: its billed `usage.cost` accounting, `x-session-id` session affinity, Anthropic prompt cache control, and attribution headers now apply like on `openrouter`
 
 ## [1.6.0] - 2026-11-20
 

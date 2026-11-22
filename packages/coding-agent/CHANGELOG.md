@@ -5,6 +5,10 @@
 ### Added
 
 - Added `compat.supportsStrictMode` for `google-generative-ai` and `google-vertex` models in `models.json`, so Gemini 3+ models served under IDs without the version can use strict tools ([#12321](https://github.com/earendil-works/pi/issues/12321))
+- Added the `vega` built-in extension: with a VEGA model selected, the footer shows the key's remaining credits from VEGA's `GET /key`, refreshed on session start, model switch, and after each turn
+- `web_search` now accepts `engine`, `mode`, and `domains` arguments, with `PION_WEB_SEARCH_ENGINE`, `PION_WEB_SEARCH_MODE`, and `PION_WEB_SEARCH_DOMAINS` as the env defaults (`PION_WEB_SEARCH_MODEL` still picks the model)
+- `tool_search` fuses BM25 with `/embeddings` similarity on a VEGA or OpenRouter credential, and adds a `/rerank` reorder pass when `PION_TOOL_SEARCH_RERANK_MODEL` is set; `PION_TOOL_SEARCH_EMBEDDINGS=off` restores BM25-only ranking
+- `read` extracts PDF text through the gateway `file-parser` plugin on a VEGA or OpenRouter credential (`PION_READ_PDF_MODEL`, `PION_READ_PDF_ENGINE`)
 
 ### Fixed
 

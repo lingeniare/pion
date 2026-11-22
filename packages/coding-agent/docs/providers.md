@@ -135,6 +135,16 @@ Regional endpoints filter models to their region. To use one, set the base URL i
 
 If the base URL rejects the key at `/models/user` or does not have that endpoint, for example a proxy configured as the OpenRouter base URL, Pion lists every OpenRouter model.
 
+OpenRouter model IDs accept gateway suffixes that change routing or pricing for a single call: `:nitro` prefers fast providers, `:floor` prefers cheap ones, `:exacto` restricts to providers with exact tool-calling support, and `:free` selects the free variant. Preset names work as `@preset-name`. Suffixes are part of the model ID, so they can be used anywhere a model is named (`--model`, `/model`, models.json).
+
+### VEGA
+
+VEGA (`api.vega.chat`) is an OpenRouter-compatible gateway: the same protocol, endpoints, and model IDs as OpenRouter, so everything in the OpenRouter section applies — including routing options, reasoning metadata, and the model ID suffixes and presets above.
+
+Authenticate with `/login vega` (device flow) or `VEGA_API_KEY`. Pion lists the chat models the key may use plus its image and classifier models, refreshes the catalog like OpenRouter's, and sends OpenRouter-style usage and billing requests (`usage.include`), so the session footer shows the billed cost reported by VEGA instead of a catalog estimate.
+
+With a VEGA model selected, the footer shows the key's remaining credits from VEGA's `/key` endpoint. The same credential powers `web_search` and `web_fetch`, semantic `tool_search` ranking (`/embeddings`, optionally `/rerank`), and PDF text extraction in `read` (see [Environment variables](environment-variables.md)).
+
 ### Azure OpenAI
 
 The provider ID is `azure` (formerly `azure-openai-responses`). Use it as the key in `auth.json`, `models.json`, and `settings.json`, and in model references such as `--model azure/gpt-5.4`.

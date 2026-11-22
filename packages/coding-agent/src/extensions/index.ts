@@ -3,6 +3,7 @@ import codemodeExtension from "./codemode/index.ts";
 import llamaExtension from "./llama/index.ts";
 import mcpExtension from "./mcp/index.ts";
 import toolSearchExtension from "./tool-search/index.ts";
+import vegaExtension from "./vega/index.ts";
 import webExtension from "./web/index.ts";
 
 export const builtInExtensions: InlineExtension[] = [
@@ -13,4 +14,5 @@ export const builtInExtensions: InlineExtension[] = [
 	{ name: "tool-search", factory: toolSearchExtension, replaceable: true, builtin: true },
 	{ name: "mcp", factory: mcpExtension, replaceable: true, builtin: true },
 	{ name: "web", factory: webExtension, replaceable: true, builtin: true },
+	{ name: "vega", factory: vegaExtension, replaceable: true, builtin: true },
 ];

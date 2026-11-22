@@ -7,7 +7,7 @@ $PiCmd = "pion"
 # Releases are published as GitHub Release assets on the fork: metadata and the
 # latest tarball under releases/latest/download, versioned manifests and
 # tarballs under releases/download/<tag>.
-$PiReleasesUrl = if ($env:PION_RELEASES_URL) { $env:PION_RELEASES_URL } else { "https://github.com/lingeniare/pi-vega/releases" }
+$PiReleasesUrl = if ($env:PION_RELEASES_URL) { $env:PION_RELEASES_URL } else { "https://github.com/lingeniare/pion/releases" }
 $PiInstallerMetadataUrl = if ($env:PION_INSTALLER_METADATA_URL) { $env:PION_INSTALLER_METADATA_URL } else { "$PiReleasesUrl/latest/download/installer-release.json" }
 $PiInstallerDownloadBase = if ($env:PION_INSTALLER_DOWNLOAD_BASE) { $env:PION_INSTALLER_DOWNLOAD_BASE } else { "$PiReleasesUrl/download" }
 # Package spec used for the legacy npm install path: a tarball URL on GitHub
@@ -1988,7 +1988,7 @@ function Write-PiNotOnPathMessage {
 
 function Invoke-PiInstaller {
   if ([System.Environment]::OSVersion.Platform -ne "Win32NT") {
-    Write-Host "This PowerShell installer is for Windows. On Unix, use: curl -fsSL https://github.com/lingeniare/pi-vega/releases/latest/download/install.sh | sh"
+    Write-Host "This PowerShell installer is for Windows. On Unix, use: curl -fsSL https://github.com/lingeniare/pion/releases/latest/download/install.sh | sh"
     exit 1
   }
 

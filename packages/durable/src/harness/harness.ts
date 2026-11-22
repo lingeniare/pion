@@ -190,7 +190,7 @@ class ConversationImpl<Tool extends ToolRegistration> implements Conversation {
 	}
 }
 
-/** Request identity of a Harness's model requests: pi-ai's defaults with provider attribution to pi. */
+/** Request identity of a Harness's model requests: pi-ai's defaults with provider attribution to VEGA. */
 export const DEFAULT_HARNESS_IDENTITY: ClientIdentity = { attribution: PI_ATTRIBUTION };
 
 /**

@@ -20,11 +20,15 @@ export interface ClientAttribution {
 	categories?: string[];
 }
 
-/** pion's attribution, used by pi-agent-core, pi-durable, and the coding agent. */
+/**
+ * pion's attribution, used by pi-agent-core, pi-durable, and the coding agent.
+ * All apps report as the VEGA app at api.vega.chat so OpenRouter rankings
+ * consolidate VEGA traffic under a single entry instead of splitting it per app.
+ */
 export const PI_ATTRIBUTION: ClientAttribution = {
-	name: "pion",
-	url: "https://vega.codes",
-	categories: ["cli-agent"],
+	name: "VEGA",
+	url: "https://api.vega.chat",
+	categories: ["general-chat"],
 };
 
 /**
@@ -93,8 +97,15 @@ function matchesHost(baseUrl: string, expectedHost: string): boolean {
 	}
 }
 
+// Keep in sync with isOpenRouterModel in utils/openrouter-cost.ts: inlined so the
+// lean ./models entry graph keeps reaching only identity.ts and version.ts.
 function isOpenRouter(target: ClientIdentityTarget): boolean {
-	return target.provider === "openrouter" || target.baseUrl.includes("openrouter.ai");
+	return (
+		target.provider === "openrouter" ||
+		target.provider === "vega" ||
+		target.baseUrl.includes("openrouter.ai") ||
+		target.baseUrl.includes("api.vega.chat")
+	);
 }
 
 function isNvidiaNim(target: ClientIdentityTarget): boolean {

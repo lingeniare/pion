@@ -17,11 +17,30 @@ const SEARCH_PROVIDERS = [
 const SEARCH_TIMEOUT_MS = 60_000;
 const DEFAULT_SEARCH_MODEL = "openai/gpt-4.1-mini";
 const DEFAULT_MAX_RESULTS = 5;
+const DEFAULT_ENGINE = "parallel";
+const DEFAULT_MODE = "basic";
 
 export const webSearchSchema = Type.Object({
 	query: Type.String({ description: "The search query, in natural language." }),
 	max_results: Type.Optional(
 		Type.Number({ description: `Results to return, 1-25. Defaults to ${DEFAULT_MAX_RESULTS}.` }),
+	),
+	engine: Type.Optional(
+		Type.String({
+			description:
+				"Search backend: auto, native, exa, firecrawl, perplexity, parallel (or others the gateway supports). Defaults to the PION_WEB_SEARCH_ENGINE env or parallel.",
+		}),
+	),
+	mode: Type.Optional(
+		Type.String({
+			description:
+				"Engine-specific search depth, e.g. basic/deep/deep-reasoning (exa) or turbo/advanced (parallel). Defaults to the PION_WEB_SEARCH_MODE env or basic.",
+		}),
+	),
+	domains: Type.Optional(
+		Type.Array(Type.String(), {
+			description: "Restrict results to these domains (allowed_domains). Overrides PION_WEB_SEARCH_DOMAINS.",
+		}),
 	),
 });
 
@@ -86,7 +105,7 @@ export function createWebSearchToolDefinition(): ToolDefinition<typeof webSearch
 		parameters: webSearchSchema,
 		annotations: { readOnlyHint: true, openWorldHint: true },
 		executionMode: "parallel",
-		async execute(_toolCallId, { query, max_results }, signal, _onUpdate, ctx) {
+		async execute(_toolCallId, { query, max_results, engine, mode, domains }, signal, _onUpdate, ctx) {
 			if (query.trim() === "") throw new Error("query must not be empty");
 			const provider = await resolveSearchProvider(ctx);
 			if (!provider) {
@@ -99,6 +118,16 @@ export function createWebSearchToolDefinition(): ToolDefinition<typeof webSearch
 				throw new Error("max_results must be an integer between 1 and 25");
 			}
 			const model = process.env.PION_WEB_SEARCH_MODEL ?? DEFAULT_SEARCH_MODEL;
+			const envDomains = process.env.PION_WEB_SEARCH_DOMAINS?.split(",")
+				.map((domain) => domain.trim())
+				.filter((domain) => domain !== "");
+			const parameters: Record<string, unknown> = {
+				engine: engine ?? process.env.PION_WEB_SEARCH_ENGINE ?? DEFAULT_ENGINE,
+				mode: mode ?? process.env.PION_WEB_SEARCH_MODE ?? DEFAULT_MODE,
+				max_results: maxResults,
+			};
+			const allowedDomains = domains ?? envDomains;
+			if (allowedDomains && allowedDomains.length > 0) parameters.allowed_domains = allowedDomains;
 			const timeout = AbortSignal.timeout(SEARCH_TIMEOUT_MS);
 			const fetchSignal = signal ? AbortSignal.any([signal, timeout]) : timeout;
 			const response = await fetch(`${provider.baseUrl}/chat/completions`, {
@@ -107,12 +136,7 @@ export function createWebSearchToolDefinition(): ToolDefinition<typeof webSearch
 				body: JSON.stringify({
 					model,
 					messages: [{ role: "user", content: query }],
-					tools: [
-						{
-							type: "openrouter:web_search",
-							parameters: { engine: "parallel", mode: "basic", max_results: maxResults },
-						},
-					],
+					tools: [{ type: "openrouter:web_search", parameters }],
 					stream: false,
 				}),
 				signal: fetchSignal,

@@ -155,6 +155,27 @@ describe("web_search", () => {
 		expect(result.details?.provider).toBe("openrouter");
 	});
 
+	it("applies engine, mode, and domains from arguments and env", async () => {
+		vi.stubEnv("PION_WEB_SEARCH_ENGINE", "exa");
+		vi.stubEnv("PION_WEB_SEARCH_DOMAINS", "docs.dev, api.dev");
+		let captured: { url: string; init?: RequestInit } | undefined;
+		mockFetch(async (url, init) => {
+			captured = { url, init };
+			return textResponse(JSON.stringify({ choices: [{ message: { content: "ok" } }] }), {
+				contentType: "application/json",
+			});
+		});
+		const ctx = ctxWithKeys({ vega: "sk-apivega-test" });
+		await tool.execute("t1", { query: "q", mode: "deep" }, undefined, undefined, ctx);
+		let parameters = JSON.parse(String(captured?.init?.body)).tools[0].parameters;
+		expect(parameters).toMatchObject({ engine: "exa", mode: "deep", allowed_domains: ["docs.dev", "api.dev"] });
+
+		// Tool arguments win over the env defaults.
+		await tool.execute("t1", { query: "q", engine: "parallel", domains: ["x.dev"] }, undefined, undefined, ctx);
+		parameters = JSON.parse(String(captured?.init?.body)).tools[0].parameters;
+		expect(parameters).toMatchObject({ engine: "parallel", mode: "basic", allowed_domains: ["x.dev"] });
+	});
+
 	it("reports a missing credential and API errors", async () => {
 		await expect(tool.execute("t1", { query: "q" }, undefined, undefined, ctxWithKeys({}))).rejects.toThrow(
 			"VEGA or OpenRouter credential",

@@ -5,7 +5,7 @@ PI_CMD="pion"
 # Releases are published as GitHub Release assets on the fork: metadata and the
 # latest tarball under releases/latest/download, versioned manifests and
 # tarballs under releases/download/<tag>.
-PI_RELEASES_URL="${PION_RELEASES_URL:-https://github.com/lingeniare/pi-vega/releases}"
+PI_RELEASES_URL="${PION_RELEASES_URL:-https://github.com/lingeniare/pion/releases}"
 PI_INSTALLER_METADATA_URL="${PION_INSTALLER_METADATA_URL:-$PI_RELEASES_URL/latest/download/installer-release.json}"
 PI_INSTALLER_DOWNLOAD_BASE="${PION_INSTALLER_DOWNLOAD_BASE:-$PI_RELEASES_URL/download}"
 # Package spec used for the legacy npm install path: a tarball URL on GitHub

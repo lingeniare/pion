@@ -27,10 +27,10 @@ The same tarball URL works with `pnpm add -g` and `bun add -g`. Pion does not re
 With Nix on macOS or Linux, install the latest release from Pion's flake. Nix builds Pion from source:
 
 ```bash
-nix profile add github:lingeniare/pi-vega/stable
+nix profile add github:lingeniare/pion/stable
 ```
 
-Older Nix versions use `nix profile install` instead. Update with `nix profile upgrade pion`; `pion update` cannot update a Nix installation. To pin a release, use a tag such as `github:lingeniare/pi-vega/v1.0.0`.
+Older Nix versions use `nix profile install` instead. Update with `nix profile upgrade pion`; `pion update` cannot update a Nix installation. To pin a release, use a tag such as `github:lingeniare/pion/v1.0.0`.
 
 Verify the installation:
 

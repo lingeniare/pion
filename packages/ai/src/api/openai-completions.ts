@@ -35,6 +35,7 @@ import type {
 	ToolCall,
 	ToolResultMessage,
 } from "../types.ts";
+import { appendAssistantMessageDiagnostic } from "../utils/diagnostics.ts";
 import { formatProviderError, normalizeProviderError } from "../utils/error-body.ts";
 import { AssistantMessageEventStream } from "../utils/event-stream.ts";
 import { shortHash } from "../utils/hash.ts";
@@ -42,6 +43,7 @@ import { headersToRecord } from "../utils/headers.ts";
 import { type ClientIdentity, getIdentityHeaders } from "../utils/identity.ts";
 import {
 	applyOpenRouterReportedCost,
+	fetchOpenRouterGeneration,
 	isOpenRouterModel,
 	type OpenRouterUsageAccounting,
 } from "../utils/openrouter-cost.ts";
@@ -691,6 +693,35 @@ export const stream: StreamFunction<"openai-completions", OpenAICompletionsOptio
 				throw new Error("Stream ended without finish_reason");
 			}
 
+			// OpenRouter's GET /generation has the final billed cost and the upstream
+			// provider that served the request. Best-effort: a miss keeps the streamed
+			// cost, and only OpenRouter-style generation ids (`gen-*`) are looked up.
+			if (isOpenRouterModel(model) && output.responseId?.startsWith("gen-") && apiKey !== "unused") {
+				const generation = await fetchOpenRouterGeneration(
+					model.baseUrl,
+					output.responseId,
+					apiKey,
+					options?.fetch,
+					options?.signal
+						? AbortSignal.any([options.signal, AbortSignal.timeout(4_000)])
+						: AbortSignal.timeout(4_000),
+				);
+				if (generation?.totalCost !== undefined) {
+					output.usage.cost.total = generation.totalCost;
+					output.usage.cost.totalFromProvider = true;
+				}
+				if (generation?.providerName !== undefined || generation?.latencyMs !== undefined) {
+					appendAssistantMessageDiagnostic(output, {
+						type: "openrouter-generation",
+						timestamp: Date.now(),
+						details: {
+							...(generation.providerName !== undefined ? { provider: generation.providerName } : {}),
+							...(generation.latencyMs !== undefined ? { latencyMs: generation.latencyMs } : {}),
+						},
+					});
+				}
+			}
+
 			stream.push({ type: "done", reason: output.stopReason, message: output });
 			stream.end();
 		} catch (error) {
@@ -825,6 +856,12 @@ function buildParams(
 
 	if (compat.supportsUsageInStreaming !== false) {
 		params.stream_options = { include_usage: true };
+	}
+
+	// OpenRouter-compatible gateways return the upstream's native token accounting
+	// (cache reads/writes, cost details) when usage.include is set.
+	if (isOpenRouterModel(model)) {
+		(params as { usage?: { include: boolean } }).usage = { include: true };
 	}
 
 	if (compat.supportsStore) {
@@ -1603,7 +1640,7 @@ function detectCompat(model: Model<"openai-completions">): ResolvedOpenAIComplet
 	const isTogether =
 		provider === "together" || baseUrl.includes("api.together.ai") || baseUrl.includes("api.together.xyz");
 	const isMoonshot = provider === "moonshotai" || provider === "moonshotai-cn" || baseUrl.includes("api.moonshot.");
-	const isOpenRouter = provider === "openrouter" || baseUrl.includes("openrouter.ai");
+	const isOpenRouter = isOpenRouterModel(model);
 	const isCloudflareWorkersAI = provider === "cloudflare-workers-ai" || baseUrl.includes("api.cloudflare.com");
 	const isCloudflareAiGateway = provider === "cloudflare-ai-gateway" || baseUrl.includes("gateway.ai.cloudflare.com");
 	const isNvidia = provider === "nvidia" || baseUrl.includes("integrate.api.nvidia.com");
@@ -1641,7 +1678,7 @@ function detectCompat(model: Model<"openai-completions">): ResolvedOpenAIComplet
 	// The developer role is OpenAI's. Other hosts' chat templates often reject it (#10741),
 	// and every host accepts system, so only OpenAI's own API gets developer by default.
 	const isOpenAI = provider === "openai" || baseUrl.includes("api.openai.com");
-	const cacheControlFormat = provider === "openrouter" && model.id.startsWith("anthropic/") ? "anthropic" : undefined;
+	const cacheControlFormat = isOpenRouter && model.id.startsWith("anthropic/") ? "anthropic" : undefined;
 
 	return {
 		supportsStore: !isNonStandard,

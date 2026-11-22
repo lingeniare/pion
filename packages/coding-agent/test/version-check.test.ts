@@ -48,7 +48,7 @@ describe("version checks", () => {
 
 		await expect(getLatestPiVersion("1.2.3")).resolves.toBe("1.2.4");
 		expect(fetchMock).toHaveBeenCalledWith(
-			"https://github.com/lingeniare/pi-vega/releases/latest/download/installer-release.json",
+			"https://github.com/lingeniare/pion/releases/latest/download/installer-release.json",
 			expect.objectContaining({
 				headers: expect.objectContaining({
 					"User-Agent": expect.stringMatching(/^pion\/1\.2\.3 /),
@@ -94,7 +94,7 @@ describe("version checks", () => {
 			Response.json({
 				packageName: "@new-scope/pion",
 				version: "1.2.4",
-				installSpec: "https://github.com/lingeniare/pi-vega/releases/download/v1.2.4/pi-coding-agent-1.2.4.tgz",
+				installSpec: "https://github.com/lingeniare/pion/releases/download/v1.2.4/pi-coding-agent-1.2.4.tgz",
 			}),
 		);
 		vi.stubGlobal("fetch", fetchMock);
@@ -102,7 +102,7 @@ describe("version checks", () => {
 		await expect(getLatestPiRelease("1.2.3")).resolves.toEqual({
 			packageName: "@new-scope/pion",
 			version: "1.2.4",
-			installSpec: "https://github.com/lingeniare/pi-vega/releases/download/v1.2.4/pi-coding-agent-1.2.4.tgz",
+			installSpec: "https://github.com/lingeniare/pion/releases/download/v1.2.4/pi-coding-agent-1.2.4.tgz",
 		});
 	});
 

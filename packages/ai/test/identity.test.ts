@@ -102,11 +102,16 @@ describe("client identity", () => {
 
 	it("attributes OpenRouter requests", () => {
 		const openRouter = target("openrouter", "https://openrouter.ai/api/v1");
-		expect(getAttributionHeaders(openRouter, { attribution: PI_ATTRIBUTION })).toEqual({
-			"HTTP-Referer": "https://vega.codes",
-			"X-OpenRouter-Title": "pion",
-			"X-OpenRouter-Categories": "cli-agent",
-		});
+		const expected = {
+			"HTTP-Referer": "https://api.vega.chat",
+			"X-OpenRouter-Title": "VEGA",
+			"X-OpenRouter-Categories": "general-chat",
+		};
+		expect(getAttributionHeaders(openRouter, { attribution: PI_ATTRIBUTION })).toEqual(expected);
+		// VEGA is an OpenRouter-compatible gateway: the built-in provider and custom providers get the same headers.
+		expect(
+			getAttributionHeaders(target("vega", "https://api.vega.chat/api/v1"), { attribution: PI_ATTRIBUTION }),
+		).toEqual(expected);
 		expect(
 			getAttributionHeaders(openRouter, {
 				attribution: { ...ACME, categories: ["cli-agent", "cloud-agent"] },
@@ -123,14 +128,14 @@ describe("client identity", () => {
 		// Custom providers routed through OpenRouter, including legacy base URLs that are not valid URLs.
 		expect(
 			getAttributionHeaders(target("custom", "not-a-url-openrouter.ai"), { attribution: PI_ATTRIBUTION }),
-		).toMatchObject({ "X-OpenRouter-Title": "pion" });
+		).toMatchObject({ "X-OpenRouter-Title": "VEGA" });
 	});
 
 	it("attributes NVIDIA NIM requests with a capitalized name and OpenCode requests with the name", () => {
 		expect(
 			getAttributionHeaders(target("nvidia", "https://example.test/v1"), { attribution: PI_ATTRIBUTION }),
 		).toEqual({
-			"X-BILLING-INVOKE-ORIGIN": "Pion",
+			"X-BILLING-INVOKE-ORIGIN": "VEGA",
 		});
 		expect(
 			getAttributionHeaders(target("custom-nim", "https://integrate.api.nvidia.com/v1"), { attribution: ACME }),
@@ -138,7 +143,7 @@ describe("client identity", () => {
 		expect(
 			getAttributionHeaders(target("opencode", "https://opencode.ai/zen/v1"), { attribution: PI_ATTRIBUTION }),
 		).toEqual({
-			"x-opencode-client": "pion",
+			"x-opencode-client": "VEGA",
 		});
 		expect(getAttributionHeaders(target("custom", "https://opencode.ai/zen/v1"), { attribution: ACME })).toEqual({
 			"x-opencode-client": "acme",

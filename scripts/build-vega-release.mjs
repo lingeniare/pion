@@ -27,10 +27,12 @@
  * Usage:
  *   npm run build                       # required first (dist/ must exist)
  *   node scripts/build-vega-release.mjs [--out .artifacts/vega-site] [--base-url https://vega.codes/pion]
- *   node scripts/build-vega-release.mjs --layout github [--repo lingeniare/pi-vega] [--tag vX.Y.Z]
+ *   node scripts/build-vega-release.mjs --layout github [--repo lingeniare/pion] [--tag vX.Y.Z]
  *
  * Deploy site layout: rsync -r <out>/ user@host:/var/www/vega.codes/
  * Deploy github layout: gh release upload <tag> <out>/*
+ *
+ * The full distribution and update scheme is documented in release-updates.md.
  */
 
 import { execFileSync, spawnSync } from "node:child_process";
@@ -56,7 +58,7 @@ const installDir = join(repoRoot, "install");
 const INTERNAL_SCOPE = "@earendil-works/";
 
 function parseArgs(argv) {
-	const options = { out: undefined, baseUrl: "https://vega.codes/pion", layout: "site", repo: "lingeniare/pi-vega", tag: undefined };
+	const options = { out: undefined, baseUrl: "https://vega.codes/pion", layout: "site", repo: "lingeniare/pion", tag: undefined };
 	for (let index = 0; index < argv.length; index += 1) {
 		const arg = argv[index];
 		if (arg === "--out") {
@@ -151,7 +153,7 @@ const TAR_LOCAL = process.platform === "win32" ? ["--force-local"] : [];
 // Unpack a scoped npm tarball, rewrite internal deps to URLs, repack, and
 // return the final tarball path plus its integrity hash.
 function repackWithUrlDeps(tarballPath, outDir, version, depUrl) {
-	const stageDir = mkdtempSync(join(tmpdir(), "pi-vega-repack-"));
+	const stageDir = mkdtempSync(join(tmpdir(), "pion-repack-"));
 	try {
 		execFileSync("tar", [...TAR_LOCAL, "-xzf", tarballPath, "-C", stageDir]);
 		const manifestPath = join(stageDir, "package", "package.json");
@@ -218,7 +220,7 @@ for (const dirName of readdirSync(join(repoRoot, "packages"))) {
 
 rmSync(outDir, { force: true, recursive: true });
 mkdirSync(releasesDir, { recursive: true });
-const packStageDir = mkdtempSync(join(tmpdir(), "pi-vega-pack-"));
+const packStageDir = mkdtempSync(join(tmpdir(), "pion-pack-"));
 const tarballs = new Map();
 try {
 	for (const [name, pkgVersion] of internalPackages) {

@@ -15,23 +15,23 @@
 
 ```bash
 # Linux / macOS
-curl -fsSL https://github.com/lingeniare/pi-vega/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/lingeniare/pion/releases/latest/download/install.sh | sh
 ```
 
 ```powershell
 # Windows (PowerShell)
-powershell -c "irm https://github.com/lingeniare/pi-vega/releases/latest/download/install.ps1 | iex"
+powershell -c "irm https://github.com/lingeniare/pion/releases/latest/download/install.ps1 | iex"
 ```
 
 Вариант 2 — через пакетный менеджер по tarball-ссылке (нужен Node.js 22.19+):
 
 ```bash
-npm install -g --ignore-scripts https://github.com/lingeniare/pi-vega/releases/latest/download/pi-coding-agent-latest.tgz
+npm install -g --ignore-scripts https://github.com/lingeniare/pion/releases/latest/download/pi-coding-agent-latest.tgz
 # или: pnpm add -g <тот же URL>
 # или: bun add -g <тот же URL>
 ```
 
-Все файлы установки лежат в [GitHub Releases](https://github.com/lingeniare/pi-vega/releases).
+Все файлы установки лежат в [GitHub Releases](https://github.com/lingeniare/pion/releases). Схема обновлений и публикации релизов — [release-updates.md](release-updates.md).
 
 ### Запуск
 
@@ -63,8 +63,8 @@ pion update        # при managed-установке
 ### Подготовка
 
 ```bash
-git clone https://github.com/lingeniare/pi-vega.git
-cd pi-vega
+git clone https://github.com/lingeniare/pion.git
+cd pion
 npm install --ignore-scripts   # зависимости без lifecycle-скриптов
 npm run build                  # собрать все пакеты в dist/
 ```
@@ -118,3 +118,4 @@ npm run hydrate-model-data   # подтянуть gitignored-данные мод
 - Правила для контрибьюторов: [CONTRIBUTING.md](CONTRIBUTING.md) и [AGENTS.md](AGENTS.md).
 - Документация CLI и расширений: [packages/coding-agent/docs](packages/coding-agent/docs).
 - Устройство VEGA-интеграции: [vega.md](vega.md).
+- Управление pion из мессенджера (опционально): [messengers.md](messengers.md).

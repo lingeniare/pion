@@ -55,7 +55,7 @@ type UpdateTarget = { type: "all" } | { type: "self" } | { type: "extensions"; s
 
 // GitHub Releases serves each tagged release's artifacts as flat files under
 // releases/download/<tag>; managed manifests live at <base>/v<version>/.
-const DEFAULT_INSTALLER_DOWNLOAD_BASE = "https://github.com/lingeniare/pi-vega/releases/download";
+const DEFAULT_INSTALLER_DOWNLOAD_BASE = "https://github.com/lingeniare/pion/releases/download";
 const MANAGED_INSTALL_MARKER = "managed-install.json";
 const MANAGED_RELEASE_VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 
@@ -1245,8 +1245,8 @@ export async function handlePackageCommand(
 					if (installMethod === "npm") {
 						const installerCommand =
 							process.platform === "win32"
-								? 'powershell -c "irm https://github.com/lingeniare/pi-vega/releases/latest/download/install.ps1 | iex"'
-								: "curl -fsSL https://github.com/lingeniare/pi-vega/releases/latest/download/install.sh | sh";
+								? 'powershell -c "irm https://github.com/lingeniare/pion/releases/latest/download/install.ps1 | iex"'
+								: "curl -fsSL https://github.com/lingeniare/pion/releases/latest/download/install.sh | sh";
 						console.log();
 						console.log(chalk.yellow(`This npm installation of ${APP_NAME} does not pin its dependencies.`));
 						console.log(chalk.yellow("Run the installer to migrate to a managed installation that does:"));

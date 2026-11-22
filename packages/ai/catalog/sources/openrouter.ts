@@ -1,29 +1,14 @@
-import { type OpenRouterModel, openRouterCost } from "../../src/providers/openrouter-api.ts";
-import type { ClassifierModel, ImageModel, Model, ThinkingLevel, ThinkingLevelMap } from "../../src/types.ts";
-import { getEffortThinkingLevelMap } from "../reasoning.ts";
+import {
+	getOpenRouterThinkingLevelMap,
+	type OpenRouterModel,
+	type OpenRouterReasoningMetadata,
+	openRouterCost,
+} from "../../src/providers/openrouter-api.ts";
+import type { ClassifierModel, ImageModel, Model } from "../../src/types.ts";
+
+export { getOpenRouterThinkingLevelMap, type OpenRouterReasoningMetadata };
 
 const OPENROUTER_MODELS_URL = "https://openrouter.ai/api/v1/models";
-
-export interface OpenRouterReasoningMetadata {
-	mandatory?: boolean;
-	default_enabled?: boolean;
-	supported_efforts?: Array<ThinkingLevel | "none">;
-	default_effort?: ThinkingLevel | "none";
-}
-
-/** Convert OpenRouter's reasoning metadata into Pi model capabilities. */
-export function getOpenRouterThinkingLevelMap(
-	reasoning: OpenRouterReasoningMetadata | undefined,
-): ThinkingLevelMap | undefined {
-	if (!reasoning) return undefined;
-	if (!reasoning.supported_efforts?.length) return reasoning.mandatory === true ? { off: null } : undefined;
-
-	// OpenRouter's supported_efforts uses the same effort values as models.dev reasoning_options,
-	// so both sources can share the same Pi thinking-level conversion.
-	const map = getEffortThinkingLevelMap([{ type: "effort", values: reasoning.supported_efforts }]);
-	if (!map) return reasoning.mandatory === true ? { off: null } : undefined;
-	return { ...map, off: reasoning.mandatory === true ? null : "none" };
-}
 
 export interface OpenRouterModelListItem extends OpenRouterModel {
 	name: string;

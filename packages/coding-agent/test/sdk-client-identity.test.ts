@@ -147,7 +147,7 @@ describe("createAgentSession client identity", () => {
 		expect(getAttributionHeaders(model, options?.identity)).toEqual({});
 	});
 
-	it("adds attribution as a CLI agent when telemetry is enabled", async () => {
+	it("adds VEGA app attribution when telemetry is enabled", async () => {
 		const model = createModel("openrouter", "https://openrouter.ai/api/v1");
 		const options = await captureOptions(model, { telemetryEnabled: true });
 
@@ -157,9 +157,9 @@ describe("createAgentSession client identity", () => {
 			attribution: PI_ATTRIBUTION,
 		});
 		expect(getAttributionHeaders(model, options?.identity)).toEqual({
-			"HTTP-Referer": "https://vega.codes",
-			"X-OpenRouter-Title": "pion",
-			"X-OpenRouter-Categories": "cli-agent",
+			"HTTP-Referer": "https://api.vega.chat",
+			"X-OpenRouter-Title": "VEGA",
+			"X-OpenRouter-Categories": "general-chat",
 		});
 	});
 

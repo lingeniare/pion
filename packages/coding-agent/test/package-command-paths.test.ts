@@ -104,7 +104,7 @@ if (process.platform !== "win32") fs.chmodSync(piPath, 0o755);
 			"fetch",
 			vi.fn(async (input: string | URL | Request) => {
 				const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-				if (url === "https://github.com/lingeniare/pi-vega/releases/latest/download/installer-release.json") {
+				if (url === "https://github.com/lingeniare/pion/releases/latest/download/installer-release.json") {
 					return Response.json({ packageName: PACKAGE_NAME, version: targetVersion });
 				}
 				const releaseUrl = `https://example.test/releases/download/v${targetVersion}`;

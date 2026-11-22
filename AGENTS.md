@@ -159,7 +159,7 @@ For release preparation, publishing, verification, or recovery, load and follow 
 
 If the user's instructions conflict with any rule in this document, ask for explicit confirmation before overriding. Only then execute their instructions.
 
-## Fork notes (pi-vega)
+## Fork notes (pion)
 
 - Branding is `pion`: CLI binary `pion` (no `pi` alias), config dirs `~/.pion/agent` and `.pion`, env vars `PION_*`. Branding flows through `piConfig` in `packages/coding-agent/package.json` (`name`, `configDir`) — keep using `APP_NAME`/`APP_TITLE`/`APP_DISPLAY_NAME`/`CONFIG_DIR_NAME`/`ENV_*` from `src/config.ts` instead of hardcoded strings. Extension protocol stays upstream-compatible: package manifest field `"pi"`, `PiManifest`, `PI_AI_VERSION`, package scope `@earendil-works/*` — do not rename these. Functional upstream endpoints (model catalog, OAuth client metadata docs, share viewer, `pi.dev/schemas`) stay on pi.dev.
 - Keep fork changes minimal and isolated so `upstream/main` merges stay cheap: prefer existing extension points and config-driven branding over rewrites of upstream logic; resolve branding merge conflicts in favor of `pion` for user-facing surfaces without reverting upstream structure. Upstream will keep adding `.pi/` files on merge; move them into `.pion/` when syncing.

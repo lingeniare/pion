@@ -71,12 +71,12 @@ describe("documentation variant", () => {
 		expect(() => resolveDocumentationVariant(variant)).toThrow("PION_EVAL_VARIANT");
 	});
 
-	it("strips only the documentation routing section from the default Pi prompt", () => {
+	it("strips only the documentation routing section from the default Pion prompt", () => {
 		const prompt = buildSystemPrompt({
 			cwd: "/workspace",
 			selectedTools: [...DOCUMENTATION_EVAL_TOOLS],
 		});
-		expect(prompt).toContain("\n<docs>\nPi documentation (read only");
+		expect(prompt).toContain("\n<docs>\npion documentation (read only");
 		expect(prompt).toContain("\n<rules>\n");
 		expect(prompt).toContain("\n<cwd>\n/workspace\n</cwd>");
 		expect(prompt).toContain("docs/models.md");
@@ -85,7 +85,7 @@ describe("documentation variant", () => {
 		expect(stripped).toContain("\n<rules>\n");
 		expect(stripped).toContain("\n<cwd>\n/workspace\n</cwd>");
 		expect(stripped).not.toContain("<docs>");
-		expect(stripped).not.toContain("Pi documentation");
+		expect(stripped).not.toContain("pion documentation");
 		expect(stripped).not.toContain("docs/models.md");
 		expect(stripped).not.toContain(getReadmePath());
 		expect(stripped).not.toContain(getDocsPath());
@@ -106,8 +106,8 @@ describe("documentation variant", () => {
 	});
 
 	it("fails closed when prompt markers are missing", () => {
-		expect(() => excludePiDocumentation("Instructions")).toThrow("no Pi documentation section");
-		expect(() => excludePiDocumentation("\n<docs>\nPi documentation\n</docs>")).toThrow(
+		expect(() => excludePiDocumentation("Instructions")).toThrow("no Pion documentation section");
+		expect(() => excludePiDocumentation("\n<docs>\npion documentation\n</docs>")).toThrow(
 			"no working-directory section",
 		);
 	});

@@ -260,11 +260,11 @@ export function verifySystemPrompt(
 ): string {
 	if (options.expectedPiDocumentation === undefined) return systemPrompt;
 	if (!systemPrompt.includes("\n<rules>\n")) {
-		throw new Error(`Pi system prompt lost its rules in the ${options.name} eval variant.`);
+		throw new Error(`Pion system prompt lost its rules in the ${options.name} eval variant.`);
 	}
-	const hasDocumentation = systemPrompt.includes("\n<docs>\nPi documentation (read only");
+	const hasDocumentation = systemPrompt.includes("\n<docs>\npion documentation (read only");
 	if (hasDocumentation !== options.expectedPiDocumentation) {
-		throw new Error(`Pi system prompt does not match the ${options.name} eval variant.`);
+		throw new Error(`Pion system prompt does not match the ${options.name} eval variant.`);
 	}
 	return systemPrompt;
 }
@@ -383,7 +383,7 @@ async function runPiCodingAgent<TOutput extends JsonValue>(
 			if (abortPromise) await abortPromise;
 		}
 		if (response === undefined) {
-			throw new Error("Pi eval input must include at least one prompt step.");
+			throw new Error("Pion eval input must include at least one prompt step.");
 		}
 		// A forced prompt is not recorded in the transcript, so use the one the transform
 		// extension sent; otherwise the replayed transcript prompt is what the provider received.
@@ -420,7 +420,7 @@ async function runPiCodingAgent<TOutput extends JsonValue>(
 		if (sessionManager) {
 			const sessionPath = sessionManager.getSessionFile();
 			if (!sessionPath || !existsSync(sessionPath)) {
-				cleanupErrors.push(new Error("Pi eval produced no session file."));
+				cleanupErrors.push(new Error("Pion eval produced no session file."));
 			} else {
 				try {
 					setArtifact(PION_SESSION_SNAPSHOT_ARTIFACT, await readFile(sessionPath, "utf8"));
@@ -464,7 +464,7 @@ async function runPiCodingAgent<TOutput extends JsonValue>(
 		}
 		throw failure;
 	}
-	if (!result) throw new Error("Pi eval completed without a result.");
+	if (!result) throw new Error("Pion eval completed without a result.");
 	return { ...result, timings: { totalMs: performance.now() - startedAt } };
 }
 
@@ -495,11 +495,12 @@ export function excludePiDocumentation(defaultPrompt: string): string {
 	const documentationStartMarker = "\n<docs>\n";
 	const documentationEndMarker = "\n</docs>";
 	const documentationStart = defaultPrompt.indexOf(documentationStartMarker);
-	if (documentationStart === -1) throw new Error("Default Pi system prompt has no Pi documentation section.");
+	if (documentationStart === -1) throw new Error("Default Pion system prompt has no Pion documentation section.");
 	const documentationEnd = defaultPrompt.indexOf(documentationEndMarker, documentationStart);
-	if (documentationEnd === -1) throw new Error("Default Pi system prompt has no complete Pi documentation section.");
+	if (documentationEnd === -1)
+		throw new Error("Default Pion system prompt has no complete Pion documentation section.");
 	const cwdStart = defaultPrompt.lastIndexOf("\n<cwd>\n");
-	if (cwdStart < documentationEnd) throw new Error("Default Pi system prompt has no working-directory section.");
+	if (cwdStart < documentationEnd) throw new Error("Default Pion system prompt has no working-directory section.");
 	return (
 		defaultPrompt.slice(0, documentationStart) + defaultPrompt.slice(documentationEnd + documentationEndMarker.length)
 	);

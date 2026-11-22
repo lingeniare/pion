@@ -1,4 +1,4 @@
-import type { ModelCost, ModelCostTier } from "../types.ts";
+import type { ModelCost, ModelCostTier, ThinkingLevel, ThinkingLevelMap } from "../types.ts";
 
 /** OpenRouter's per-token prices, as decimal strings. */
 export interface OpenRouterPricing {
@@ -30,6 +30,38 @@ export interface OpenRouterModel {
 	context_length?: number | null;
 	top_provider?: { context_length?: number | null; max_completion_tokens?: number | null };
 	pricing?: OpenRouterPricing;
+}
+
+/** Reasoning metadata OpenRouter reports per model in `GET /models`. */
+export interface OpenRouterReasoningMetadata {
+	mandatory?: boolean;
+	default_enabled?: boolean;
+	supported_efforts?: Array<ThinkingLevel | "none">;
+	default_effort?: ThinkingLevel | "none";
+}
+
+const THINKING_LEVELS: readonly ThinkingLevel[] = ["minimal", "low", "medium", "high", "xhigh", "max"];
+
+/**
+ * Convert OpenRouter's reasoning metadata into Pi model capabilities. `supported_efforts`
+ * uses the same effort values as pi thinking levels; a mandatory model gets `off: null`
+ * because it cannot be asked not to think.
+ */
+export function getOpenRouterThinkingLevelMap(
+	reasoning: OpenRouterReasoningMetadata | undefined,
+): ThinkingLevelMap | undefined {
+	if (!reasoning) return undefined;
+	const efforts = reasoning.supported_efforts ?? [];
+	if (efforts.length === 0) return reasoning.mandatory === true ? { off: null } : undefined;
+	const supported = new Set(efforts);
+	if (!THINKING_LEVELS.some((level) => supported.has(level)) && !supported.has("none")) {
+		return reasoning.mandatory === true ? { off: null } : undefined;
+	}
+	const map: ThinkingLevelMap = { off: reasoning.mandatory === true ? null : "none" };
+	for (const level of THINKING_LEVELS) {
+		map[level] = supported.has(level) ? level : null;
+	}
+	return map;
 }
 
 /**

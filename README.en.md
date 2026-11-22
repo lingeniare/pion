@@ -7,7 +7,7 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://github.com/lingeniare/pi-vega/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lingeniare/pi-vega?style=flat-square&label=release" /></a>
+  <a href="https://github.com/lingeniare/pion/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/lingeniare/pion?style=flat-square&label=release" /></a>
   <a href="https://t.me/ingeniare"><img alt="Telegram" src="https://img.shields.io/badge/Telegram-@ingeniare-2CA5E0?style=flat-square&logo=telegram&logoColor=white" /></a>
   <a href="https://vega.codes"><img alt="vega.codes" src="https://img.shields.io/badge/vega.codes-website-6E56CF?style=flat-square" /></a>
   <a href="https://api.vega.chat"><img alt="api.vega.chat" src="https://img.shields.io/badge/api.vega.chat-provider-0EA5E9?style=flat-square" /></a>
@@ -31,27 +31,27 @@ A fork of [Pi](https://github.com/earendil-works/pi) — the minimal, extensible
 Installer (managed install with pinned dependencies and `pion update`):
 
 ```bash
-curl -fsSL https://github.com/lingeniare/pi-vega/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/lingeniare/pion/releases/latest/download/install.sh | sh
 ```
 
 ```powershell
-powershell -c "irm https://github.com/lingeniare/pi-vega/releases/latest/download/install.ps1 | iex"
+powershell -c "irm https://github.com/lingeniare/pion/releases/latest/download/install.ps1 | iex"
 ```
 
 Or with a package manager via tarball URL (requires Node.js 22.19+):
 
 ```bash
-npm install -g --ignore-scripts https://github.com/lingeniare/pi-vega/releases/latest/download/pi-coding-agent-latest.tgz
+npm install -g --ignore-scripts https://github.com/lingeniare/pion/releases/latest/download/pi-coding-agent-latest.tgz
 # or: pnpm add -g / bun add -g — same URL
 ```
 
-Releases and all install artifacts live on [GitHub Releases](https://github.com/lingeniare/pi-vega/releases). To update, run `pion update` (managed installs) or rerun the installer.
+Releases and all install artifacts live on [GitHub Releases](https://github.com/lingeniare/pion/releases). To update, run `pion update` (managed installs) or rerun the installer. The distribution and publishing scheme is documented in [release-updates.md](release-updates.md).
 
 From source, for development:
 
 ```bash
-git clone https://github.com/lingeniare/pi-vega.git
-cd pi-vega
+git clone https://github.com/lingeniare/pion.git
+cd pion
 npm install --ignore-scripts
 npm run build
 ```
@@ -90,11 +90,12 @@ The project is open: issues and pull requests are welcome.
 - Telegram: [@ingeniare](https://t.me/ingeniare) — questions, bugs, ideas
 - Email: [mail@vega.chat](mailto:mail@vega.chat)
 - Docs: [packages/coding-agent/docs](packages/coding-agent/docs) — plus [upstream docs](https://github.com/earendil-works/pi/tree/main/docs)
+- Phone control via messengers (Matrix/Telegram, optional, RU): [messengers.md](messengers.md)
 - Upstream: [earendil-works/pi](https://github.com/earendil-works/pi) — the fork stays in sync with it
 
-## What is Pi
+## What is pion
 
-Pi is an agent harness that adapts to your workflows, not the other way around: [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), [themes](packages/coding-agent/docs/themes.md). Bundle them as [packages](packages/coding-agent/docs/packages.md) and share via npm or git.
+pion is an agent harness that adapts to your workflows, not the other way around: [extensions](packages/coding-agent/docs/extensions.md), [skills](packages/coding-agent/docs/skills.md), [prompt templates](packages/coding-agent/docs/prompt-templates.md), [themes](packages/coding-agent/docs/themes.md). Bundle them as [packages](packages/coding-agent/docs/packages.md) and share via npm or git.
 
 Use it [interactively](packages/coding-agent/docs/usage.md), in [print/JSON mode](packages/coding-agent/docs/cli.md), over [RPC](packages/coding-agent/docs/rpc.md), or through the [TypeScript SDK](packages/coding-agent/docs/sdk.md).
 

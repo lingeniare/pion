@@ -231,7 +231,7 @@ function shouldUseServerSideFallbackBeta(model: Model<"anthropic-messages">): bo
 }
 
 function getAnthropicCompat(model: Model<"anthropic-messages">) {
-	const isOpenRouter = model.provider === "openrouter" || model.baseUrl.includes("openrouter.ai");
+	const isOpenRouter = isOpenRouterModel(model);
 	return {
 		supportsEagerToolInputStreaming: model.compat?.supportsEagerToolInputStreaming ?? true,
 		supportsLongCacheRetention: model.compat?.supportsLongCacheRetention ?? true,

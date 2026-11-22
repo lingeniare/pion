@@ -12,11 +12,13 @@ import { resolveSchemaRef } from "@earendil-works/pi-codemode/declarations";
 import { type Static, Type } from "typebox";
 import type {
 	ExtensionAPI,
+	ExtensionToolContext,
 	ToolDefinition,
 	ToolExposure,
 	ToolInfo,
 	ToolNamespace,
 } from "../../core/extensions/types.ts";
+import { rankToolSearch } from "./embeddings.ts";
 
 export const TOOL_SEARCH_TOOL_NAME = "tool_search";
 export const DEFAULT_TOOL_SEARCH_LIMIT = 8;
@@ -152,7 +154,7 @@ function normalizeName(name: string): string {
  * Whether the whole query is the tool's name: its full name or a suffix after a `__` separator, so
  * `thread_read` and `app__thread_read` both name `mcp__app__thread_read`.
  */
-function isExactNameQuery(query: string, name: string): boolean {
+export function isExactNameQuery(query: string, name: string): boolean {
 	const normalized = normalizeName(name);
 	return normalized === query || normalized.endsWith(`__${query}`);
 }
@@ -296,16 +298,18 @@ function isSearchable(exposure: ToolExposure): boolean {
 /**
  * Rank the searchable tools that are not active yet and activate the matches, so the next model
  * call declares them. Activation is recorded in the transcript like any tool change.
+ * With a VEGA or OpenRouter credential the ranking fuses BM25 with `/embeddings` similarity.
  */
-function searchAndLoad(
+async function searchAndLoad(
 	tools: NonNullable<ToolSearchToolOptions["tools"]>,
+	ctx: ExtensionToolContext,
 	query: string,
 	limit: number,
-): ToolSearchResultTool[] {
+): Promise<ToolSearchResultTool[]> {
 	const active = tools.getActiveTools();
 	const candidates = tools.getAllTools().filter((tool) => isSearchable(tool.exposure) && !active.includes(tool.name));
 	const documents = candidates.map((tool) => createToolSearchDocument(tool, tool.namespace));
-	const matches = new Bm25Ranker().rank(query, documents, limit);
+	const matches = await rankToolSearch(ctx, query, documents, limit);
 	if (matches.length > 0) tools.setActiveTools([...active, ...matches.map((match) => match.name)]);
 	return matches.map((match) => ({
 		name: match.name,
@@ -332,11 +336,11 @@ export function createToolSearchToolDefinition(
 		exposure: "model-only",
 		// A query can match any tool that is not declared yet.
 		reachesTools: () => "all",
-		async execute(_toolCallId, { query, limit }) {
+		async execute(_toolCallId, { query, limit }, _signal, _onUpdate, ctx) {
 			if (query.trim() === "") throw new Error("query must not be empty");
 			const max = limit ?? DEFAULT_TOOL_SEARCH_LIMIT;
 			if (!Number.isInteger(max) || max <= 0) throw new Error("limit must be a positive integer");
-			const tools = options.tools ? searchAndLoad(options.tools, query, max) : [];
+			const tools = options.tools ? await searchAndLoad(options.tools, ctx, query, max) : [];
 			const text =
 				tools.length === 0
 					? "No matching tools found."

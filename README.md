@@ -7,7 +7,7 @@
   </a>
 </p>
 <p align="center">
-  <a href="https://github.com/lingeniare/pi-vega/releases/latest"><img alt="Релиз" src="https://img.shields.io/github/v/release/lingeniare/pi-vega?style=flat-square&label=release" /></a>
+  <a href="https://github.com/lingeniare/pion/releases/latest"><img alt="Релиз" src="https://img.shields.io/github/v/release/lingeniare/pion?style=flat-square&label=release" /></a>
   <a href="https://t.me/ingeniare"><img alt="Telegram" src="https://img.shields.io/badge/Telegram-@ingeniare-2CA5E0?style=flat-square&logo=telegram&logoColor=white" /></a>
   <a href="https://vega.codes"><img alt="vega.codes" src="https://img.shields.io/badge/vega.codes-%D1%81%D0%B0%D0%B9%D1%82-6E56CF?style=flat-square" /></a>
   <a href="https://api.vega.chat"><img alt="api.vega.chat" src="https://img.shields.io/badge/api.vega.chat-%D0%BF%D1%80%D0%BE%D0%B2%D0%B0%D0%B9%D0%B4%D0%B5%D1%80-0EA5E9?style=flat-square" /></a>
@@ -31,27 +31,27 @@
 Инсталлер (managed-установка с пином зависимостей и `pion update`):
 
 ```bash
-curl -fsSL https://github.com/lingeniare/pi-vega/releases/latest/download/install.sh | sh
+curl -fsSL https://github.com/lingeniare/pion/releases/latest/download/install.sh | sh
 ```
 
 ```powershell
-powershell -c "irm https://github.com/lingeniare/pi-vega/releases/latest/download/install.ps1 | iex"
+powershell -c "irm https://github.com/lingeniare/pion/releases/latest/download/install.ps1 | iex"
 ```
 
 Либо через пакетный менеджер по tarball-URL (нужен Node.js 22.19+):
 
 ```bash
-npm install -g --ignore-scripts https://github.com/lingeniare/pi-vega/releases/latest/download/pi-coding-agent-latest.tgz
+npm install -g --ignore-scripts https://github.com/lingeniare/pion/releases/latest/download/pi-coding-agent-latest.tgz
 # или: pnpm add -g / bun add -g — тот же URL
 ```
 
-Релизы и все файлы установки лежат в [GitHub Releases](https://github.com/lingeniare/pi-vega/releases). Обновление — `pion update` (managed-установка) или повторный запуск инсталлера.
+Релизы и все файлы установки лежат в [GitHub Releases](https://github.com/lingeniare/pion/releases). Обновление — `pion update` (managed-установка) или повторный запуск инсталлера. Схема раздачи и публикации релизов описана в [release-updates.md](release-updates.md).
 
 Из исходников для разработки:
 
 ```bash
-git clone https://github.com/lingeniare/pi-vega.git
-cd pi-vega
+git clone https://github.com/lingeniare/pion.git
+cd pion
 npm install --ignore-scripts
 npm run build
 ```
@@ -90,6 +90,7 @@ pion
 - Telegram: [@ingeniare](https://t.me/ingeniare) — вопросы, баги, идеи
 - Email: [mail@vega.chat](mailto:mail@vega.chat)
 - Документация: [packages/coding-agent/docs](packages/coding-agent/docs) — плюс [документы апстрима](https://github.com/earendil-works/pi/tree/main/docs)
+- Управление с телефона (Matrix/Telegram, опционально): [messengers.md](messengers.md)
 - Апстрим: [earendil-works/pi](https://github.com/earendil-works/pi) — форк регулярно синхронизируется с ним
 
 ## Что такое pion

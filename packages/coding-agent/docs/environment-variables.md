@@ -83,12 +83,21 @@ These variables are read by Pion itself:
 | `PION_PACKAGE_DIR` | Override the package directory, useful for Nix/Guix store paths |
 | `PION_OFFLINE` | Disable automatic network activity, including model catalog refreshes |
 | `PION_SKIP_VERSION_CHECK` | Disable the latest-version request |
-| `PION_LATEST_VERSION_URL` | Override the latest-version endpoint used by update checks (default `https://github.com/lingeniare/pi-vega/releases/latest/download/installer-release.json`) |
-| `PION_INSTALLER_DOWNLOAD_BASE` | Override the managed-installer download base (default `https://github.com/lingeniare/pi-vega/releases/download`) |
+| `PION_LATEST_VERSION_URL` | Override the latest-version endpoint used by update checks (default `https://github.com/lingeniare/pion/releases/latest/download/installer-release.json`) |
+| `PION_INSTALLER_DOWNLOAD_BASE` | Override the managed-installer download base (default `https://github.com/lingeniare/pion/releases/download`) |
 | `PION_SELF_UPDATE_COMMAND` | Command `pion update` runs to update Pion itself, split on whitespace, with `{packageName}`, `{version}`, and `{installSpec}` placeholders. Takes precedence over the `selfUpdateCommand` setting. See [Custom update command](cli.md#custom-update-command) |
 | `PION_TELEMETRY` | Override install/update telemetry and provider attribution headers: `1`/`true`/`yes` or `0`/`false`/`no` |
 | `PION_CODEMODE_MAX_WORKERS` | Maximum codemode workers alive at once across all sessions in the process; default `2`. Each worker's script may use up to 256 MB. Raise it when one process runs several sessions, such as in-process subagents. Further scripts wait for a free worker. See [Codemode](codemode.md) |
 | `PION_CACHE_RETENTION` | Set to `long` for extended provider prompt caching where supported |
+| `PION_WEB_SEARCH_MODEL` | Model that runs `web_search` server-side; default `openai/gpt-4.1-mini` |
+| `PION_WEB_SEARCH_ENGINE` | Search backend for `web_search` (`auto`, `native`, `exa`, `firecrawl`, `perplexity`, `parallel`, …); default `parallel`. The `engine` tool argument overrides it |
+| `PION_WEB_SEARCH_MODE` | Engine-specific search depth for `web_search` (`basic`, `deep`, `deep-reasoning`, `turbo`, `advanced`); default `basic`. The `mode` tool argument overrides it |
+| `PION_WEB_SEARCH_DOMAINS` | Comma-separated domains `web_search` may return results from. The `domains` tool argument overrides it |
+| `PION_TOOL_SEARCH_EMBEDDINGS` | Set to `off` to disable the embeddings half of `tool_search` ranking (BM25 only). With a VEGA or OpenRouter credential, ranking fuses BM25 with `/embeddings` similarity by default |
+| `PION_TOOL_SEARCH_EMBEDDING_MODEL` | Embedding model for `tool_search`; default `openai/text-embedding-3-small` |
+| `PION_TOOL_SEARCH_RERANK_MODEL` | Rerank model for `tool_search` via `/rerank` (for example a Cohere reranker); unset disables the rerank pass |
+| `PION_READ_PDF_MODEL` | Model that extracts PDF text in `read`; default `openai/gpt-4.1-mini` |
+| `PION_READ_PDF_ENGINE` | Force the `file-parser` engine for PDF reads: `pdf-text`, `mistral-ocr`, or `native`; unset keeps the gateway default |
 | `PION_SHARE_VIEWER_URL` | Override the base URL used by `/share` |
 | `PION_RADIUS_GATEWAY` | Override the Radius gateway origin used by `/bug` uploads |
 | `PION_CLEAR_ON_SHRINK` | Set to `1` to clear empty rows when rendered content shrinks; the `terminal.clearOnShrink` setting takes precedence. See [Settings](settings.md) |

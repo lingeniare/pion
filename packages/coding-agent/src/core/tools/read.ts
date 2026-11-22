@@ -7,6 +7,7 @@ import { processImage } from "../../utils/image-process.ts";
 import { detectSupportedImageMimeTypeFromFile } from "../../utils/mime.ts";
 import type { ExtensionContext, ToolDefinition } from "../extensions/types.ts";
 import { resolveReadPathAsync } from "./path-utils.ts";
+import { isPdfPath, readPdfText } from "./read-pdf.ts";
 import { readRenderers } from "./renderers/read.ts";
 import { type TypeBoxAgentTool, wrapToolDefinition } from "./tool-definition-wrapper.ts";
 import { DEFAULT_MAX_BYTES, DEFAULT_MAX_LINES, formatSize, type TruncationResult, truncateHead } from "./truncate.ts";
@@ -236,7 +237,7 @@ export function createReadToolDefinition(
 	return {
 		name: "read",
 		label: "read",
-		description: `Read the contents of a file. Supports text files and images (jpg, png, gif, webp, bmp). Images are sent as attachments. For text files, output is truncated to ${DEFAULT_MAX_LINES} lines or ${DEFAULT_MAX_BYTES / 1024}KB (whichever is hit first). Use offset/limit for large files. When you need the full file, continue with offset until complete.`,
+		description: `Read the contents of a file. Supports text files, PDFs, and images (jpg, png, gif, webp, bmp). Images are sent as attachments; PDFs are extracted to text through the VEGA/OpenRouter credential. For text files, output is truncated to ${DEFAULT_MAX_LINES} lines or ${DEFAULT_MAX_BYTES / 1024}KB (whichever is hit first). Use offset/limit for large files. When you need the full file, continue with offset until complete.`,
 		promptSnippet: readToolSystemPromptContribution.snippet,
 		promptGuidelines: [...readToolSystemPromptContribution.guidelines],
 		parameters: readSchema,
@@ -297,15 +298,29 @@ export function createReadToolDefinition(
 								// Read text content. Convert offset from 1-indexed input to 0-indexed line access.
 								const startLine = offset ? Math.max(0, offset - 1) : 0;
 								const startLineDisplay = startLine + 1;
-								const { totalFileLines, truncation, firstLineBytes } =
-									ops.createReadStream && isStreamableRange(offset, limit)
-										? await selectLinesFromStream(
-												ops.createReadStream(absolutePath, { signal }),
-												startLine,
-												limit,
-												signal,
-											)
-										: selectLinesFromBuffer(await ops.readFile(absolutePath), startLine, limit);
+								let selected: SelectedLines;
+								if (isPdfPath(absolutePath)) {
+									// PDFs go through the gateway's file-parser plugin, then the same line pipeline as text.
+									const pdfText = await readPdfText(
+										await ops.readFile(absolutePath),
+										absolutePath,
+										ctx,
+										signal,
+									);
+									if (aborted) return;
+									selected = selectLinesFromBuffer(Buffer.from(pdfText, "utf-8"), startLine, limit);
+								} else {
+									selected =
+										ops.createReadStream && isStreamableRange(offset, limit)
+											? await selectLinesFromStream(
+													ops.createReadStream(absolutePath, { signal }),
+													startLine,
+													limit,
+													signal,
+												)
+											: selectLinesFromBuffer(await ops.readFile(absolutePath), startLine, limit);
+								}
+								const { totalFileLines, truncation, firstLineBytes } = selected;
 								if (aborted) return;
 								// Check if offset is out of bounds.
 								if (startLine >= totalFileLines) {
