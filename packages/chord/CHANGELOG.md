@@ -8,6 +8,10 @@
 - `PluginSource` (`installPlugin`, the app kit's `plugins.install`) is tagged: `{ kind: "git", git, ref }` or `{ kind: "npm", npm, version }`. Migration: add the `kind`.
 - `SeriesResult` (`ChordStore.commitSeries`) is tagged: `{ kind: "stored", stored }` or `{ kind: "refused", stored, refused }` (was `{ stored, refused? }`). Migration: read `refused` after checking `result.kind === "refused"`.
 
+### Added
+
+- `SYNC_PROTOCOL` (1), the version of a store's sync rules, exported from `@earendil-works/chord/sync`: remote adapters send it with every request so a remote whose rules changed for a session (a handoff to another server) can refuse writers that do not know them; it is raised when the rules change, not when a body's encoding (`LOG_VERSION`) does
+
 ## [1.6.0] - 2026-11-20
 
 ### Breaking Changes

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- The app is renamed to `pion`: the binary is `pion` (no `pi` alias), the user config dir is `~/.pion/agent`, the project config dir is `.pion/`, and env vars are `PION_*` such as `PION_CODING_AGENT_DIR`. Settings, sessions and extensions under `~/.pi/agent` or `.pi/` are not picked up; rename those dirs to keep them
+
 ### Added
 
 - Added `compat.supportsStrictMode` for `google-generative-ai` and `google-vertex` models in `models.json`, so Gemini 3+ models served under IDs without the version can use strict tools ([#12321](https://github.com/earendil-works/pi/issues/12321))
