@@ -2835,8 +2835,14 @@ export class InteractiveMode {
 			setHeader: (factory) => this.setExtensionHeader(factory),
 			setTitle: (title) => this.ui.terminal.setTitle(title),
 			custom: (factory, options) => this.showExtensionCustom(factory, options),
-			pasteToEditor: (text) => this.editor.handleInput(`\x1b[200~${text}\x1b[201~`),
-			setEditorText: (text) => this.editor.setText(text),
+			pasteToEditor: (text) => {
+				this.editor.handleInput(`\x1b[200~${text}\x1b[201~`);
+				this.ui.requestRender();
+			},
+			setEditorText: (text) => {
+				this.editor.setText(text);
+				this.ui.requestRender();
+			},
 			getEditorText: () => this.editor.getExpandedText?.() ?? this.editor.getText(),
 			editor: (title, prefill) => this.showExtensionEditor(title, prefill),
 			addAutocompleteProvider: (factory) => {
@@ -4521,6 +4527,7 @@ export class InteractiveMode {
 			await this.ui.terminal.drainInput(1000);
 			this.stop();
 			await flushStdout();
+			killTrackedDetachedChildren();
 			process.exit(0);
 		}
 
@@ -4542,6 +4549,9 @@ export class InteractiveMode {
 		}
 
 		await flushStdout();
+		// dispose() only starts killing a running `!` command, which on Windows loses the race with
+		// exit. After the last await, so it also catches a shell spawned after the abort.
+		killTrackedDetachedChildren();
 		process.exit(0);
 	}
 
@@ -4604,10 +4614,7 @@ export class InteractiveMode {
 	private registerSignalHandlers(): void {
 		this.unregisterSignalHandlers();
 
-		const signals: NodeJS.Signals[] = ["SIGTERM"];
-		if (process.platform !== "win32") {
-			signals.push("SIGHUP");
-		}
+		const signals: NodeJS.Signals[] = ["SIGTERM", "SIGHUP"];
 
 		for (const signal of signals) {
 			const handler = () => {
