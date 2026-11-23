@@ -90,7 +90,10 @@ Managed-путь в инсталлере повторяет `pion update`: metad
 `package.json` и `package-lock.json` — это обработанные копии
 `packages/coding-agent/install-lock/`: `resolved` внутренних пакетов ведут на
 тарболы этого же тега, `integrity` — sha512 файлов релиза. Поэтому перезаливать
-тарболы под тем же тегом нельзя: integrity перестанет сходиться.
+тарболы под тем же тегом нельзя: integrity перестанет сходиться. npm 12 по
+умолчанию запрещает зависимости-tarball'ы по URL (`allow-remote=none`,
+EALLOWREMOTE), поэтому managed `npm ci` и legacy `npm install -g` передают
+`--allow-remote=all`; на старых npm флаг инертен.
 
 ## `installer-release.json`
 

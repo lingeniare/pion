@@ -176,12 +176,16 @@ function getSelfUpdateCommandForMethod(
 			// pi.dev advertises releases immediately, so a configured npm age gate would
 			// block the update. npm has no per-package age gate, so this also lets new
 			// transitive dependency releases through. Managed installs avoid this.
+			// --allow-remote: npm 12 disables tarball-URL installs by default
+			// (EALLOWREMOTE); release specs point at GitHub release tarballs. Older npm
+			// treats the flag as an inert user config.
 			const installStep = makeSelfUpdateCommandStep(command, [
 				...prefixArgs,
 				"install",
 				"-g",
 				"--ignore-scripts",
 				"--min-release-age=0",
+				"--allow-remote=all",
 				target.installSpec,
 			]);
 			const uninstallStep =

@@ -843,6 +843,8 @@ Content`,
 					"--prefix",
 					realpathSync(join(agentDir, "npm")),
 					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
 					"--no-audit",
 					"--no-fund",
 				],
@@ -890,7 +892,17 @@ Content`,
 
 			expect(runCommandSpy).toHaveBeenCalledWith(
 				"npm",
-				["install", "@scope/pkg", "--prefix", realNpmRoot, "--legacy-peer-deps", "--no-audit", "--no-fund"],
+				[
+					"install",
+					"@scope/pkg",
+					"--prefix",
+					realNpmRoot,
+					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
+					"--no-audit",
+					"--no-fund",
+				],
 				undefined,
 			);
 			expect(runCommandSpy).toHaveBeenCalledWith(
@@ -948,7 +960,15 @@ Content`,
 
 			expect(runCommandSpy).toHaveBeenCalledWith(
 				"npm",
-				["install", "--omit=dev", "--legacy-peer-deps", "--no-audit", "--no-fund"],
+				[
+					"install",
+					"--omit=dev",
+					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
+					"--no-audit",
+					"--no-fund",
+				],
 				{
 					cwd: targetDir,
 				},
@@ -1018,7 +1038,15 @@ Content`,
 			expect(runCommandSpy).toHaveBeenCalledWith("git", ["clean", "-fdx"], { cwd: targetDir });
 			expect(runCommandSpy).toHaveBeenCalledWith(
 				"npm",
-				["install", "--omit=dev", "--legacy-peer-deps", "--no-audit", "--no-fund"],
+				[
+					"install",
+					"--omit=dev",
+					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
+					"--no-audit",
+					"--no-fund",
+				],
 				{
 					cwd: targetDir,
 				},
@@ -1173,7 +1201,15 @@ Content`,
 
 			expect(runCommandSpy).toHaveBeenCalledWith(
 				"npm",
-				["install", "--omit=dev", "--legacy-peer-deps", "--no-audit", "--no-fund"],
+				[
+					"install",
+					"--omit=dev",
+					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
+					"--no-audit",
+					"--no-fund",
+				],
 				{
 					cwd: targetDir,
 				},
@@ -1204,7 +1240,15 @@ Content`,
 
 			expect(runCommandSpy).toHaveBeenCalledWith(
 				"npm",
-				["install", "--omit=dev", "--legacy-peer-deps", "--no-audit", "--no-fund"],
+				[
+					"install",
+					"--omit=dev",
+					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
+					"--no-audit",
+					"--no-fund",
+				],
 				{
 					cwd: targetDir,
 				},
@@ -1243,7 +1287,15 @@ Content`,
 
 			expect(runCommandSpy).toHaveBeenCalledWith(
 				"npm",
-				["install", "--omit=dev", "--legacy-peer-deps", "--no-audit", "--no-fund"],
+				[
+					"install",
+					"--omit=dev",
+					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
+					"--no-audit",
+					"--no-fund",
+				],
 				{
 					cwd: targetDir,
 				},
@@ -2713,6 +2765,8 @@ export default function(api) { api.registerTool({ name: "test", description: "te
 					"--prefix",
 					realpathSync(join(tempDir, ".pion", "npm")),
 					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
 					"--no-audit",
 					"--no-fund",
 				],
@@ -2787,6 +2841,8 @@ export default function(api) { api.registerTool({ name: "test", description: "te
 						"--prefix",
 						realpathSync(join(agentDir, "npm")),
 						"--legacy-peer-deps",
+						"--allow-remote=all",
+						"--allow-git=all",
 						"--no-audit",
 						"--no-fund",
 					]);
@@ -2906,6 +2962,8 @@ export default function(api) { api.registerTool({ name: "test", description: "te
 					"--prefix",
 					realpathSync(join(agentDir, "npm")),
 					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
 					"--no-audit",
 					"--no-fund",
 				],
@@ -2921,6 +2979,8 @@ export default function(api) { api.registerTool({ name: "test", description: "te
 					"--prefix",
 					realpathSync(join(tempDir, ".pion", "npm")),
 					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
 					"--no-audit",
 					"--no-fund",
 				],

@@ -2038,7 +2038,18 @@ export class DefaultPackageManager implements PackageManager {
 					"--config.strict-dep-builds=false",
 				];
 			case "npm":
-				return ["install", "--omit=dev", "--legacy-peer-deps", "--no-audit", "--no-fund"];
+				// npm 12 disables git and tarball-URL dependencies by default
+				// (EALLOWGIT/EALLOWREMOTE); extension sources accept both. Older
+				// npm treats the flags as inert user configs.
+				return [
+					"install",
+					"--omit=dev",
+					"--legacy-peer-deps",
+					"--allow-remote=all",
+					"--allow-git=all",
+					"--no-audit",
+					"--no-fund",
+				];
 			default:
 				return ["install"];
 		}
@@ -2072,7 +2083,20 @@ export class DefaultPackageManager implements PackageManager {
 			];
 		}
 		// npm audit fix would run without --legacy-peer-deps and install pi peers, so skip audit advice.
-		return ["install", ...specs, "--prefix", installRoot, "--legacy-peer-deps", "--no-audit", "--no-fund"];
+		// npm 12 disables git and tarball-URL dependencies by default
+		// (EALLOWGIT/EALLOWREMOTE); extension sources accept both. Older npm
+		// treats the flags as inert user configs.
+		return [
+			"install",
+			...specs,
+			"--prefix",
+			installRoot,
+			"--legacy-peer-deps",
+			"--allow-remote=all",
+			"--allow-git=all",
+			"--no-audit",
+			"--no-fund",
+		];
 	}
 
 	private async installNpm(source: NpmSource, scope: SourceScope, temporary: boolean): Promise<void> {

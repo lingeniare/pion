@@ -37,7 +37,7 @@ powershell -c "irm https://vega.codes/pion/install.ps1 | iex"
 The installer pins all dependencies and updates Pion with `pion update`. Alternatively, install directly from a tarball, which does not pin transitive dependencies:
 
 ```bash
-npm install -g --ignore-scripts https://vega.codes/pion/releases/latest/pi-coding-agent-latest.tgz
+npm install -g --ignore-scripts --allow-remote=all https://vega.codes/pion/releases/latest/pi-coding-agent-latest.tgz
 ```
 
 The same tarball URL works with `pnpm add -g` and `bun add -g`. Pion requires Node.js 22.19 or newer. The macOS, Linux, and Windows installers can install it if needed. Pion does not require dependency lifecycle scripts for a normal npm installation.

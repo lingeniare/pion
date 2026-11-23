@@ -226,9 +226,10 @@ describe("detectInstallMethod", () => {
 				"-g",
 				"--ignore-scripts",
 				"--min-release-age=0",
+				"--allow-remote=all",
 				"@earendil-works/pi-coding-agent",
 			],
-			display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 @earendil-works/pi-coding-agent`,
+			display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 --allow-remote=all @earendil-works/pi-coding-agent`,
 		});
 	});
 
@@ -249,9 +250,10 @@ describe("detectInstallMethod", () => {
 				"-g",
 				"--ignore-scripts",
 				"--min-release-age=0",
+				"--allow-remote=all",
 				"@earendil-works/pi-coding-agent@1.2.3",
 			],
-			display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 @earendil-works/pi-coding-agent@1.2.3`,
+			display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 --allow-remote=all @earendil-works/pi-coding-agent@1.2.3`,
 		});
 	});
 
@@ -262,8 +264,17 @@ describe("detectInstallMethod", () => {
 
 		expect(command).toEqual({
 			command: "npm",
-			args: ["--prefix", prefix, "install", "-g", "--ignore-scripts", "--min-release-age=0", "@new-scope/pion"],
-			display: `npm --prefix ${prefix} uninstall -g @mariozechner/pi-coding-agent && npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 @new-scope/pion`,
+			args: [
+				"--prefix",
+				prefix,
+				"install",
+				"-g",
+				"--ignore-scripts",
+				"--min-release-age=0",
+				"--allow-remote=all",
+				"@new-scope/pion",
+			],
+			display: `npm --prefix ${prefix} uninstall -g @mariozechner/pi-coding-agent && npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 --allow-remote=all @new-scope/pion`,
 			steps: [
 				{
 					command: "npm",
@@ -279,9 +290,10 @@ describe("detectInstallMethod", () => {
 						"-g",
 						"--ignore-scripts",
 						"--min-release-age=0",
+						"--allow-remote=all",
 						"@new-scope/pion",
 					],
-					display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 @new-scope/pion`,
+					display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 --allow-remote=all @new-scope/pion`,
 				},
 			],
 		});
@@ -301,9 +313,10 @@ describe("detectInstallMethod", () => {
 				"-g",
 				"--ignore-scripts",
 				"--min-release-age=0",
+				"--allow-remote=all",
 				"@earendil-works/pi-coding-agent",
 			],
-			display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 @earendil-works/pi-coding-agent`,
+			display: `npm --prefix ${prefix} install -g --ignore-scripts --min-release-age=0 --allow-remote=all @earendil-works/pi-coding-agent`,
 		});
 	});
 
@@ -319,6 +332,7 @@ describe("detectInstallMethod", () => {
 			"-g",
 			"--ignore-scripts",
 			"--min-release-age=0",
+			"--allow-remote=all",
 			"@earendil-works/pi-coding-agent",
 		]);
 	});
@@ -329,7 +343,7 @@ describe("detectInstallMethod", () => {
 		const command = getSelfUpdateCommand("@earendil-works/pi-coding-agent");
 
 		expect(command?.display).toBe(
-			`npm --prefix "${prefix}" install -g --ignore-scripts --min-release-age=0 @earendil-works/pi-coding-agent`,
+			`npm --prefix "${prefix}" install -g --ignore-scripts --min-release-age=0 --allow-remote=all @earendil-works/pi-coding-agent`,
 		);
 	});
 
@@ -340,7 +354,7 @@ describe("detectInstallMethod", () => {
 
 		expect(detectInstallMethod()).toBe("npm");
 		expect(getUpdateInstruction("@earendil-works/pi-coding-agent")).toBe(
-			"Run: npm install -g --ignore-scripts --min-release-age=0 @earendil-works/pi-coding-agent",
+			"Run: npm install -g --ignore-scripts --min-release-age=0 --allow-remote=all @earendil-works/pi-coding-agent",
 		);
 	});
 

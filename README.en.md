@@ -41,7 +41,7 @@ powershell -c "irm https://github.com/lingeniare/pion/releases/latest/download/i
 Or with a package manager via tarball URL (requires Node.js 22.19+):
 
 ```bash
-npm install -g --ignore-scripts https://github.com/lingeniare/pion/releases/latest/download/pi-coding-agent-latest.tgz
+npm install -g --ignore-scripts --allow-remote=all https://github.com/lingeniare/pion/releases/latest/download/pi-coding-agent-latest.tgz
 # or: pnpm add -g / bun add -g — same URL
 ```
 

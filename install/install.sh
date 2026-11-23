@@ -15,10 +15,15 @@ PI_MANAGED_INSTALL_MARKER="managed-install.json"
 # Pion publishes npm-shrinkwrap.json, so the explicit installer/reinstaller can
 # bypass npm's release-age gate without reopening transitive dependency ranges.
 PI_NPM_INSTALL_MIN_AGE_ARG="--min-release-age=0"
+# npm 12 refuses tarball-URL dependencies unless allowed (allow-remote defaults
+# to none); the managed lockfile and the legacy package spec resolve internal
+# packages to GitHub release tarballs. Older npm treats the flag as an inert
+# user config.
+PI_NPM_ALLOW_REMOTE_ARG="--allow-remote=all"
 PI_ESC=$(printf '\033')
 PI_CR=$(printf '\r')
 PI_ETX=$(printf '\003')
-readonly PI_PACKAGE PI_CMD PI_RELEASES_URL PI_INSTALLER_METADATA_URL PI_INSTALLER_DOWNLOAD_BASE PI_PACKAGE_SPEC PI_MANAGED_INSTALL_MARKER PI_NPM_INSTALL_MIN_AGE_ARG PI_ESC PI_CR PI_ETX
+readonly PI_PACKAGE PI_CMD PI_RELEASES_URL PI_INSTALLER_METADATA_URL PI_INSTALLER_DOWNLOAD_BASE PI_PACKAGE_SPEC PI_MANAGED_INSTALL_MARKER PI_NPM_INSTALL_MIN_AGE_ARG PI_NPM_ALLOW_REMOTE_ARG PI_ESC PI_CR PI_ETX
 
 pi_installer_main() {
   set -eu
@@ -537,7 +542,7 @@ print_existing_global_pi_not_writable_message() {
   printf 'Pion is already installed at: %s\n\n' "$existing_pi_path" >&2
   printf 'Installing another copy under %s/.local could leave your shell using the old global pion, so this installer stopped.\n\n' "$HOME" >&2
   printf 'Update or remove the existing global install first. If it was installed with npm, you can run:\n\n' >&2
-  printf '  sudo npm install -g --ignore-scripts %s %s\n\n' "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_PACKAGE_SPEC" >&2
+  printf '  sudo npm install -g --ignore-scripts %s %s %s\n\n' "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_NPM_ALLOW_REMOTE_ARG" "$PI_PACKAGE_SPEC" >&2
   printf 'or uninstall it first with:\n\n' >&2
   printf '  sudo npm uninstall -g %s\n\n' "$PI_PACKAGE" >&2
   printf 'Then run this installer again.\n' >&2
@@ -828,9 +833,9 @@ print_pi_install_command() {
   elif pi_managed_install_enabled; then
     printf 'Pion will install to %s/%s' "$PI_MANAGED_BIN_DIR" "$PI_CMD"
   elif [ -n "${PI_NPM_INSTALL_PREFIX:-}" ]; then
-    printf 'Using legacy self managed installation\n  npm install -g --ignore-scripts %s --prefix %s %s' "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_NPM_INSTALL_PREFIX" "$PI_PACKAGE_SPEC"
+    printf 'Using legacy self managed installation\n  npm install -g --ignore-scripts %s %s --prefix %s %s' "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_NPM_ALLOW_REMOTE_ARG" "$PI_NPM_INSTALL_PREFIX" "$PI_PACKAGE_SPEC"
   else
-    printf 'Using legacy self managed installation\n  npm install -g --ignore-scripts %s %s' "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_PACKAGE_SPEC"
+    printf 'Using legacy self managed installation\n  npm install -g --ignore-scripts %s %s %s' "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_NPM_ALLOW_REMOTE_ARG" "$PI_PACKAGE_SPEC"
   fi
 }
 
@@ -1004,9 +1009,9 @@ run_pi_install() {
 run_npm_install_pi() {
   npm_loglevel="$1"
   if [ -n "${PI_NPM_INSTALL_PREFIX:-}" ]; then
-    npm install -g --ignore-scripts "$PI_NPM_INSTALL_MIN_AGE_ARG" --prefix "$PI_NPM_INSTALL_PREFIX" --no-fund --no-audit "--loglevel=$npm_loglevel" --progress=false "$PI_PACKAGE_SPEC"
+    npm install -g --ignore-scripts "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_NPM_ALLOW_REMOTE_ARG" --prefix "$PI_NPM_INSTALL_PREFIX" --no-fund --no-audit "--loglevel=$npm_loglevel" --progress=false "$PI_PACKAGE_SPEC"
   else
-    npm install -g --ignore-scripts "$PI_NPM_INSTALL_MIN_AGE_ARG" --no-fund --no-audit "--loglevel=$npm_loglevel" --progress=false "$PI_PACKAGE_SPEC"
+    npm install -g --ignore-scripts "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_NPM_ALLOW_REMOTE_ARG" --no-fund --no-audit "--loglevel=$npm_loglevel" --progress=false "$PI_PACKAGE_SPEC"
   fi
 }
 
@@ -1298,7 +1303,7 @@ run_managed_install_pi() {
   fi
 
   printf 'Installing managed Pion dependencies\n' >&2
-  if (cd "$managed_stage_dir" && npm ci --ignore-scripts "$PI_NPM_INSTALL_MIN_AGE_ARG" --omit=dev --include=optional --no-fund --no-audit "--loglevel=$npm_loglevel" --progress=false); then
+  if (cd "$managed_stage_dir" && npm ci --ignore-scripts "$PI_NPM_INSTALL_MIN_AGE_ARG" "$PI_NPM_ALLOW_REMOTE_ARG" --omit=dev --include=optional --no-fund --no-audit "--loglevel=$npm_loglevel" --progress=false); then
     managed_status=0
   else
     managed_status=$?

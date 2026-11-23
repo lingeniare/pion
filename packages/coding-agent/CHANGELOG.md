@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed installs and updates failing on npm 12 with `EALLOWREMOTE`: npm 12 disables tarball-URL and git dependencies by default (`allow-remote`/`allow-git` default `none`), while release lockfiles and package specs resolve internal packages to GitHub release tarballs. The installers, `pion update`, the npm self-update command and extension installs now pass `--allow-remote=all` (plus `--allow-git=all` for extension installs); npm 10/11 treats the flags as inert config
+
 ## [1.7.0] - 2026-11-22
 
 ### Breaking Changes

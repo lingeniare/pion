@@ -17,6 +17,11 @@ $PiManagedInstallMarker = "managed-install.json"
 # Pion publishes npm-shrinkwrap.json, so the explicit installer/reinstaller can
 # bypass npm's release-age gate without reopening transitive dependency ranges.
 $NpmMinReleaseAgeArg = "--min-release-age=0"
+# npm 12 refuses tarball-URL dependencies unless allowed (allow-remote defaults
+# to none); the managed lockfile and the legacy package spec resolve internal
+# packages to GitHub release tarballs. Older npm treats the flag as an inert
+# user config.
+$NpmAllowRemoteArg = "--allow-remote=all"
 $NodeMinimum = [version]"22.19.0"
 $GitForWindowsLatestReleaseApi = "https://api.github.com/repos/git-for-windows/git/releases/latest"
 $PiEsc = [char]27
@@ -1148,9 +1153,9 @@ function Write-PiInstallCommand {
     return "Pion will install to $piCommand"
   }
   if ($env:PI_NPM_INSTALL_PREFIX) {
-    return "Using legacy self managed installation`n  npm.cmd install -g --ignore-scripts $NpmMinReleaseAgeArg --prefix `"$env:PI_NPM_INSTALL_PREFIX`" $PiPackageSpec"
+    return "Using legacy self managed installation`n  npm.cmd install -g --ignore-scripts $NpmMinReleaseAgeArg $NpmAllowRemoteArg --prefix `"$env:PI_NPM_INSTALL_PREFIX`" $PiPackageSpec"
   }
-  return "Using legacy self managed installation`n  npm.cmd install -g --ignore-scripts $NpmMinReleaseAgeArg $PiPackageSpec"
+  return "Using legacy self managed installation`n  npm.cmd install -g --ignore-scripts $NpmMinReleaseAgeArg $NpmAllowRemoteArg $PiPackageSpec"
 }
 
 function Write-PiActionMenu {
@@ -1304,7 +1309,7 @@ function Choose-PiAction {
 function Get-NpmInstallPiArgs {
   param([string]$LogLevel, [string]$Progress)
 
-  $args = @("install", "-g", "--ignore-scripts", $NpmMinReleaseAgeArg, "--no-fund", "--no-audit", "--loglevel=$LogLevel", "--progress=$Progress")
+  $args = @("install", "-g", "--ignore-scripts", $NpmMinReleaseAgeArg, $NpmAllowRemoteArg, "--no-fund", "--no-audit", "--loglevel=$LogLevel", "--progress=$Progress")
   if ($env:PI_NPM_INSTALL_PREFIX) {
     $args += @("--prefix", $env:PI_NPM_INSTALL_PREFIX)
   }
@@ -1640,7 +1645,7 @@ function Invoke-PiManagedInstall {
     $managedVersion = $global:PiManagedVersion
 
     Write-Host "Installing managed Pion dependencies"
-    $npmArgs = @("ci", "--ignore-scripts", $NpmMinReleaseAgeArg, "--omit=dev", "--include=optional", "--no-fund", "--no-audit", "--loglevel=$LogLevel", "--progress=false")
+    $npmArgs = @("ci", "--ignore-scripts", $NpmMinReleaseAgeArg, $NpmAllowRemoteArg, "--omit=dev", "--include=optional", "--no-fund", "--no-audit", "--loglevel=$LogLevel", "--progress=false")
     Push-Location $managedStageDir
     # Windows PowerShell promotes redirected native stderr to error records. npm
     # writes normal verbose progress there, so rely on its checked exit status.
@@ -1755,6 +1760,7 @@ function Install-PiPackageWithProgress {
         [string]$InstallerDownloadBase,
         [string]$ManagedInstallMarker,
         [string]$MinReleaseAgeArg,
+        [string]$AllowRemoteArg,
         [string]$OutputLog
       )
 
@@ -1765,6 +1771,7 @@ function Install-PiPackageWithProgress {
       $global:PiInstallerDownloadBase = $InstallerDownloadBase
       $global:PiManagedInstallMarker = $ManagedInstallMarker
       $global:NpmMinReleaseAgeArg = $MinReleaseAgeArg
+      $global:NpmAllowRemoteArg = $AllowRemoteArg
       try {
         . ([ScriptBlock]::Create($FunctionSource))
         Invoke-PiInstall "verbose" *> $OutputLog
@@ -1774,7 +1781,7 @@ function Install-PiPackageWithProgress {
         $failureMessage | Out-File -FilePath $OutputLog -Append
         1
       }
-    } -ArgumentList $workerSource, $PiPackage, $PiCmd, $PiInstallerMetadataUrl, $PiInstallerDownloadBase, $PiManagedInstallMarker, $NpmMinReleaseAgeArg, $logFile
+    } -ArgumentList $workerSource, $PiPackage, $PiCmd, $PiInstallerMetadataUrl, $PiInstallerDownloadBase, $PiManagedInstallMarker, $NpmMinReleaseAgeArg, $NpmAllowRemoteArg, $logFile
   } else {
     $npmArgs = [System.Collections.ArrayList]::new()
     $npmArgs.AddRange([string[]](Get-NpmInstallPiArgs "verbose" "false"))

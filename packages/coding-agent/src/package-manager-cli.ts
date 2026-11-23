@@ -97,9 +97,13 @@ async function fetchInstallerArtifact(url: string, label: string): Promise<strin
 async function runManagedNpmCi(stageDir: string): Promise<void> {
 	// No age-gate override: the release lockfile pins every package, so npm never
 	// resolves versions and a configured min-release-age does not apply.
+	// --allow-remote: npm 12 disables tarball-URL dependencies by default
+	// (EALLOWREMOTE); the release lockfile resolves internal packages to GitHub
+	// release tarballs. Older npm treats the flag as an inert user config.
 	const args = [
 		"ci",
 		"--ignore-scripts",
+		"--allow-remote=all",
 		"--omit=dev",
 		"--include=optional",
 		"--no-fund",
